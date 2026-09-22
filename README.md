@@ -134,6 +134,7 @@ Add this to your VS Code MCP configuration, for example `.vscode/mcp.json`:
 {
   "servers": {
     "postgres": {
+      "type": "stdio",
       "command": "poetry",
       "args": ["-C", "/absolute/path/to/postgres-mcp-server", "run", "python", "postgres-mcp-server/main.py"]
     },
