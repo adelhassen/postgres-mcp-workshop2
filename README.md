@@ -35,13 +35,26 @@ DB_PORT=5432
 
 ## Testing
 
-### Demo 1: Paste schema into Claude
+### Demo 1: Paste schema into the AI Assistant
 
-Provide a database schema directly in the conversation and ask Claude questions about the tables and relationships.
+Provide a database schema directly in the conversation and ask the AI Assistant questions about the tables and relationships.
+
+Example Questions:
+
+- What columns do we have in the sessions table?
+- What is the longest session recorded?
+- What tables do we have available in the database? 
+- How many users pay with Apple Pay? <-- we expect an incorrect answer 
 
 ### Demo 2: Upload Local CSV/file
 
 Upload the data file and query the contents in natural language.
+
+Example Questions:
+
+- How many users are on an iOS device?
+- What is the breakdown of users by country?
+
 
 ### Demo 3: API
 
@@ -53,9 +66,28 @@ poetry run uvicorn api.simple_api:app --reload
 
 Test the API at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
 
-### Demo 4: Connect Claude to Postgres with MCP
+Example Query:
+
+```SQL
+SELECT COUNT(DISTINCT s.user_id) AS apple_pay_users FROM payments p JOIN subscriptions s USING (subscription_id) WHERE LOWER(p.method) = 'apple_pay';
+```
+
+
+### Demo 4: Connect the AI Assistant to Postgres with MCP
 
 Run the MCP server through the MCP Inspector or connect it to VS Code using the configuration below.
+
+After implementing all three MCP servers, try these out:
+
+- Give me a breakdown of revenue for 2025 by payment method. Then create an HTML report with the results, save it in a reports folder, and commit the report to GitHub.
+- How many engaged users have we had over the last 7 days? <-- we expect an incorrect answer 
+- How many committed customers did we lose in August 2026? <-- we expect an incorrect answer 
+
+Note, we have the following business definitions:
+
+- “Engaged user”: User had ≥3 sessions in the last 7 days. 
+- “Committed customer”: A customer subscribed to the annual plan.
+
 
 ### MCP Inspector (Recommended)
 
@@ -104,7 +136,20 @@ Add this to your VS Code MCP configuration, for example `.vscode/mcp.json`:
     "postgres": {
       "command": "poetry",
       "args": ["-C", "/absolute/path/to/postgres-mcp-server", "run", "python", "postgres-mcp-server/main.py"]
-    }
+    },
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/x/all"
+    },
+    "filesystem": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "${workspaceFolder}"
+      ]
+     }
   }
 }
 ```
